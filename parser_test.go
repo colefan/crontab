@@ -1,9 +1,10 @@
 package crontab
 
 import "testing"
+import "time"
 
 func TestCronTabFormat(t *testing.T) {
-	if s, err := Parse("0 0 10,14,16 * * ?"); err != nil {
+	if s, err := Parse("0/5 * * * * ?"); err != nil {
 		t.Fail()
 	} else {
 		s.ShowFormat()
@@ -15,5 +16,6 @@ func TestCronTabFormat(t *testing.T) {
 		s.ShowFormat()
 	}
 	//
+	time.Sleep(time.Second * 5)
 
 }

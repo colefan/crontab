@@ -85,6 +85,8 @@ func (c *CronTab) AddFunc(spec string, cmd func()) error {
 // AddJob Schedule adds a Job to the Cron to be run on the given schedule.
 func (c *CronTab) AddJob(spec string, cmd Job) error {
 	schedule, err := Parse(spec)
+	// fmt.Println(err.Error())
+	// schedule.ShowFormat()
 	if err != nil {
 		return err
 	}
@@ -100,6 +102,7 @@ func (c *CronTab) Schedule(schedule Schedule, cmd Job) {
 	}
 	if !c.running {
 		c.entries = append(c.entries, entry)
+		// fmt.Printf("c.entries %v\n", c.entries)
 		return
 	}
 	c.add <- entry
@@ -159,9 +162,11 @@ func (c *CronTab) runWithRecovery(j Job) {
 // access to the 'running' state variable.
 func (c *CronTab) run() {
 	// Figure out the next activation times for each entry.
+	// fmt.Println("go run")
 	now := time.Now().In(c.location)
 	for _, entry := range c.entries {
 		entry.next = entry.schedule.Next(now)
+		// fmt.Printf("entry.next %s\n", entry.next.Format("2006-01-02 15:04:05"))
 	}
 
 	for {

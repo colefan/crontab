@@ -67,14 +67,20 @@ func Parse(spec string) (Schedule, error) {
 	s := &SpecSchedule{}
 	//0 seconds  0-12  1,2,3  0/5 9-17
 	if err := parseHMS(splitSpec[0], &s.Second, 0, 59); err != nil {
+		// fmt.Printf("parse Second error %v\n", err)
 		return nil, err
 	}
 	//1 minutes 0-12  1,2,3  0/5 9-17
+	// fmt.Println("Minutes = " + splitSpec[1])
 	if err := parseHMS(splitSpec[1], &s.Minute, 0, 59); err != nil {
+		// fmt.Printf("parse Minute error %v\n", err)
+
 		return nil, err
 	}
 	//2 Hours 0-24  1,2,3 0/4 9-17
 	if err := parseHMS(splitSpec[2], &s.Hour, 0, 23); err != nil {
+		// fmt.Printf("parse Hour error %v\n", err)
+
 		return nil, err
 	}
 
@@ -83,15 +89,20 @@ func Parse(spec string) (Schedule, error) {
 	}
 	//3 Dom *  ? 1-31 1,2,3  1-5
 	if err := parseDays(splitSpec[3], &s.Dom, 1, 31); err != nil {
+		// fmt.Printf("parse Dom error %v\n", err)
+
 		return nil, err
 	}
 	//4 Month * 1-12 1,2,3 1-2
+
 	if err := parseDays(splitSpec[4], &s.Month, 1, 12); err != nil {
+		// fmt.Printf("parse Day error %v\n", err)
 		return nil, err
 	}
 	//5 Dow * ? 0-6 1,2,3,5,6,0 1-2
 
 	if err := parseDays(splitSpec[5], &s.Dow, 0, 6); err != nil {
+		// fmt.Printf("parse Dow error %v\n", err)
 		return nil, err
 	}
 
@@ -177,6 +188,14 @@ func parseHMS(format string, options *uint64, min uint64, max uint64) error {
 	if len(format) == 0 {
 		return fmt.Errorf("parse second,minutes,hour format error ,is empty")
 	}
+	// fmt.Println("format = " + format)
+	if format == "*" {
+		for i := min; i <= max; i++ {
+			*options |= (1 << i)
+		}
+		return nil
+	}
+
 	if len(format) <= 2 {
 		if val, err := strconv.ParseUint(format, 10, 64); err != nil {
 			return err
@@ -206,6 +225,7 @@ func parseHMS(format string, options *uint64, min uint64, max uint64) error {
 		var start uint64
 		var step uint64
 		var err error
+		// fmt.Println("splits = " + splits[0] + "/" + splits[1])
 		if start, err = strconv.ParseUint(splits[0], 10, 64); err != nil {
 			return err
 		}
